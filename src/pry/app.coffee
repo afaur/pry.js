@@ -7,6 +7,7 @@ class App
   _commands: []
 
   constructor: (@scope) ->
+    @hist   = new History()
     @output = new Output()
     @prompt = new SyncPrompt({
       typeahead: @typeahead
@@ -15,7 +16,7 @@ class App
 
   commands: ->
     if @_commands.length is 0
-      @_commands.push new command({@output, @scope}) for i,command of commands
+      @_commands.push new command({@output, @scope, @hist}) for i,command of commands
     @_commands
 
   typeahead: (input = '') =>
@@ -28,6 +29,7 @@ class App
     [items, input]
 
   find_command: (input, chain) =>
+    @hist.push input.trim()
     for command in @commands()
       if match = command.match(input.trim())
         args = String(match[1]).trim().split(' ')
